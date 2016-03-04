@@ -91,6 +91,9 @@ public class FirstFit extends Memory {
 	@Override
 	public void printLayout() {
 		System.out.println("------------------------------------");
+
+		printAlternateLayout();
+
 		int counter = 0;
 		for(Pointer p : pointers){
 			if(counter < p.pointsAt()){
@@ -101,6 +104,77 @@ public class FirstFit extends Memory {
 		}
 		if(counter < cells.length){
 			System.out.println("" + counter + " - " + cells.length + " Free");
+		}
+	}
+
+	private char[][] generateEmptyMemory(int size) {
+		char[][] output = new char[5][size];
+
+		for (int i = 0; i < size; i++) {
+			if (i == 0 || i == size - 1) {
+				output[0][i] = ' ';
+				output[1][i] = '#';
+				output[2][i] = '|';
+				output[3][i] = '#';
+				output[4][i] = ' ';
+			} else {
+				output[0][i] = ' ';
+				output[1][i] = '-';
+				output[2][i] = ' ';
+				output[3][i] = '-';
+				output[4][i] = ' ';
+			}
+		}
+
+		return output;
+	}
+
+	private void printAlternateLayout() {
+
+		char[][] output = generateEmptyMemory(this.cells.length);
+		boolean indexAbove = true;
+		int pointerIndex = 0;
+
+		for (Pointer p : pointers) {
+			int start = p.pointsAt();
+			int end = start + pointersSize.get(p) - 1;
+
+			output[1][start] = '#';
+			output[2][start] = '|';
+			output[3][start] = '#';
+
+			output[1][end] = '#';
+			output[2][end] = '|';
+			output[3][end] = '#';
+
+			for (int i = start + 1; i < end; i++) {
+				output[2][i] = '*';
+			}
+
+			printIndex(output, start, indexAbove);
+			indexAbove = !indexAbove;
+			printIndex(output, end, indexAbove);
+			indexAbove = !indexAbove;
+
+		}
+
+		for (int i = 0; i < output.length; i++)
+			System.out.println(new String(output[i], 0, output[i].length));
+
+
+	}
+
+	private void printIndex(char[][] output, int index, boolean indexAbove) {
+
+		char[] chars = Integer.toString(index).toCharArray();
+		for (int i = 0; i < chars.length; i++) {
+			int row;
+			if (indexAbove)
+				row = 0;
+			else
+				row = 4;
+
+			output[row][index + i] = chars[i];
 		}
 	}
 	
@@ -121,12 +195,6 @@ public class FirstFit extends Memory {
 	 * (Ascending)
 	 */
 	private void sortPointers(){
-		pointers.sort(new Comparator<Pointer>(){
-			@Override
-			public int compare(Pointer p1, Pointer p2) {
-				return p1.pointsAt() - p2.pointsAt();
-			}
-			
-		});
+		pointers.sort((p1, p2) -> { return p1.pointsAt() - p2.pointsAt(); });
 	}
 }
