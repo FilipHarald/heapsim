@@ -77,14 +77,13 @@ public class FirstFit extends Memory {
 	 */
 	@Override
 	public void printLayout() {
-		//TODO: fungerar ej
 		int counter = 0;
 		for(Pointer p : pointers){
-			if(counter != p.pointsAt()){
+			if(counter < p.pointsAt()){
 				System.out.println("" + counter + " - " + (p.pointsAt() - 1) + " Free");
 			}
-			System.out.println("" + p.pointsAt() + " - " + (p.pointsAt() + pointersSize.get(p)) + " Allocated");
-			counter = p.pointsAt() + pointersSize.get(p) + 1;
+			System.out.println("" + p.pointsAt() + " - " + (p.pointsAt() + pointersSize.get(p) - 1) + " Allocated");
+			counter = p.pointsAt() + pointersSize.get(p);
 		}
 		if(counter < cells.length){
 			System.out.println("" + counter + " - " + cells.length + " Free");
@@ -95,11 +94,10 @@ public class FirstFit extends Memory {
 	 * Compacts the memory space.
 	 */
 	public void compact() {
-		//TODO: fungerar ej tror jag? (alt. bara printLayout som inte fungerar
 		int counter = 0;
 		for(Pointer p : pointers){
 			p.pointAt(counter);
-			counter = p.pointsAt() + 1;
+			counter = p.pointsAt() + pointersSize.get(p);
 		}
 	}
 	
