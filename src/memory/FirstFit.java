@@ -13,6 +13,9 @@ import java.util.LinkedList;
 public class FirstFit extends Memory {
 	private LinkedList<Pointer> pointers;
 	private HashMap<Pointer, Integer> pointersSize;
+	private boolean isCompacted;
+	private boolean secondTry;
+	
 
 	/**
 	 * Initializes an instance of a first fit-based memory.
@@ -23,6 +26,8 @@ public class FirstFit extends Memory {
 		super(size);
 		pointers = new LinkedList<Pointer>();
 		pointersSize = new HashMap<Pointer, Integer>();
+		isCompacted = false;
+		secondTry = false;
 	}
 
 	/**
@@ -40,8 +45,15 @@ public class FirstFit extends Memory {
 			}
 			counter = p.pointsAt() + pointersSize.get(p);
 		}
-		if(cells.length - counter > size){
+		if(cells.length - counter + 1 > size){
 			return addPointer(counter, size);
+		}
+		if(!secondTry && !isCompacted){
+			secondTry = true;
+			compact();
+			Pointer  temp = alloc(size);
+			secondTry = false;
+			return temp;
 		}
 		return null;
 	}
@@ -65,6 +77,7 @@ public class FirstFit extends Memory {
 		pointersSize.remove(p);
 		pointers.remove(p);
 		sortPointers();
+		isCompacted = false;
 	}
 	
 	/**
@@ -77,12 +90,13 @@ public class FirstFit extends Memory {
 	 */
 	@Override
 	public void printLayout() {
+		System.out.println("------------------------------------");
 		int counter = 0;
 		for(Pointer p : pointers){
 			if(counter < p.pointsAt()){
 				System.out.println("" + counter + " - " + (p.pointsAt() - 1) + " Free");
 			}
-			System.out.println("" + p.pointsAt() + " - " + (p.pointsAt() + pointersSize.get(p) - 1) + " Allocated");
+			System.out.println("" + p.pointsAt() + " - " + (p.pointsAt() + pointersSize.get(p) - 1) + " Allocated  (pointerSize is " + pointersSize.get(p) + ")");
 			counter = p.pointsAt() + pointersSize.get(p);
 		}
 		if(counter < cells.length){
@@ -99,6 +113,7 @@ public class FirstFit extends Memory {
 			p.pointAt(counter);
 			counter = p.pointsAt() + pointersSize.get(p);
 		}
+		isCompacted = true;
 	}
 	
 	/**

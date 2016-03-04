@@ -22,7 +22,7 @@ public class ComplexBatch {
 	}
 
 	public void run() {
-		Memory m = new FirstFit(1000); // Swap this for  your own implementation
+		FirstFit m = new FirstFit(1000); // Swap this for  your own implementation
 		Pointer[] ps = new Pointer[20];
 		
 		ps[0] = m.alloc(100);
@@ -41,6 +41,7 @@ public class ComplexBatch {
 		ps[6] = m.alloc(90);
 		ps[6].write(range(5000, 5089));
 		m.release(ps[0]);
+		//borde vara 545 använda platser här
 		ps[7] = m.alloc(60);
 		ps[7].write(range(10, 69));
 		m.release(ps[4]);
@@ -67,10 +68,13 @@ public class ComplexBatch {
 		m.release(ps[12]);
 		ps[16] = m.alloc(170);
 		ps[16].write(range(10001, 10170));
+		m.printLayout();
 		ps[17] = m.alloc(105);
 		ps[17].write(range(-40, 65));
+		m.printLayout();
 		ps[18] = m.alloc(40);
 		ps[18].write(range(1, 40));
+		//Här blir minnet fullt
 		ps[19] = m.alloc(50);
 		ps[19].write(range(101, 150));
 		
