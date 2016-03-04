@@ -22,28 +22,52 @@ public class SimpleBatch {
 	}
 
 	public void run() {
-		Memory m = new FirstFit(100); // Swap this for  your own implementation
+		FirstFit m = new FirstFit(100); // Swap this for  your own implementation
 		Pointer p1, p2, p3, p4, p5, p6;
 		
 		p1 = m.alloc(20);
 		p1.write(range(1, 20));
+		
+		System.out.println("111111111111111111111111111111 \n" + m);
+		
 		p2 = m.alloc(5);
 		p2.write(range(38, 42));
+		
+		System.out.println("111111111111111111111111111111 \n" + m);
+		
 		p3 = m.alloc(30);
 		p3.write(range(100, 129));
+		
+		System.out.println("111111111111111111111111111111 \n" + m);
+		
 		p4 = m.alloc(15);
 		p4.write(range(101, 115));
+		
+		System.out.println("111111111111111111111111111111 \n" + m);
+		
 		m.release(p3);
+		
+		System.out.println("111111111111111111111111111111 \n" + m);
+		
 		m.release(p1);
+		
+		System.out.println("111111111111111111111111111111 \n" + m);
+		
 		p5 = m.alloc(10);
 		p5.write(range(70, 79));
+		
+		System.out.println("111111111111111111111111111111 \n" + m);
+		
 		p6 = m.alloc(15);
 		p6.write(range(1, 15));
 		
+		
+		System.out.println("111111111111111111111111111111 \n" + m);
+		
 		m.printLayout();
 		
-//		m.compact();
-//		System.out.println("After compact()");
-//		m.printLayout();
+		m.compact();
+		System.out.println("After compact()");
+		m.printLayout();
 	}
 }
