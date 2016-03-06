@@ -11,8 +11,8 @@ import java.util.*;
 public class BestFit extends Memory {
 
 	private class Block {
-		private final Pointer pointer;
-		private final int size;
+		private Pointer pointer;
+		private int size;
 		private boolean free = true;
 		private Block next = null;
 		private Block previous = null;
@@ -105,11 +105,15 @@ public class BestFit extends Memory {
 
 		}
 
-		blocks.sort(new BlockComparator());
+		sort();
 
 		printAlternateLayout();
 
 		return p;
+	}
+
+	private void sort() {
+		blocks.sort(new BlockComparator());
 	}
 	
 	/**
@@ -127,23 +131,34 @@ public class BestFit extends Memory {
 
 			block.free = true;
 
-			if (block.next != null && block.next.free) {
-				Block combined = new Block(block.pointer, block.size + block.next.size);
-				blocks.remove(block.next);
-				blocks.remove(block);
-				blocks.add(combined);
+			block = combine(block, block.next);
+			if (block != null)
+				combine(block.previous, block);
 
-				combined.previous = block.previous;
-				combined.next = block.next.next;
-			}
 
 			break;
 		}
 
-		blocks.sort(new BlockComparator());
+		sort();
 
 		printAlternateLayout();
 
+	}
+
+	private Block combine(Block b1, Block b2) {
+		Block combined = null;
+		if (b1.free && b2.free) {
+			combined = new Block(b1.pointer, b1.size + b2.size);
+			blocks.remove(b1);
+			blocks.remove(b2);
+			blocks.add(combined);
+
+			b1.previous.next = combined;
+			combined.previous = b1.previous;
+			combined.next = b2.next;
+		}
+
+		return combined;
 	}
 
 
@@ -170,7 +185,6 @@ public class BestFit extends Memory {
 		printAlternateLayout();
 	}
 
-
 	private void printAlternateLayout() {
 
 		String[][] output = generateEmptyMemory(this.cells.length);
@@ -185,9 +199,6 @@ public class BestFit extends Memory {
 			for (int i = start; i < end; i++) {
 				output[2][i] = block.free ? "░" : "█";
 			}
-			//output[2][end - 1] = "▌";
-			//output[2][start] = "▐";
-			//halfTone = !halfTone;
 
 			printText(output, start, indexAbove, String.valueOf(start - 1));
 			indexAbove = !indexAbove;
@@ -201,8 +212,43 @@ public class BestFit extends Memory {
 				System.out.print(output[i][j]);
 			System.out.println();
 		}
+	}
 
+	public void compact() {
+		System.out.println("Compacting...");
 
+		int freeBlocks = (int)blocks.stream().filter(b -> b.free).count();
+
+		blocks.sort((b1, b2) -> { return b1.pointer.pointsAt() - b2.pointer.pointsAt(); });
+
+		for (int i = 0; i < blocks.size(); i++) {
+
+			Block b = blocks.get(i);
+
+			if (b.free && b.next != null) {
+				if (!b.next.free)
+					flip(b, b.next);
+				else {
+					combine(b, b.next);
+					i--;
+					blocks.sort((b1, b2) -> { return b1.pointer.pointsAt() - b2.pointer.pointsAt(); });
+				}
+			}
+
+			printAlternateLayout();
+		}
+
+		sort();
+
+	}
+
+	private void flip(Block b1, Block b2) {
+		int size = b1.size;
+		b1.size = b2.size;
+		b2.size = size;
+		b2.pointer.pointAt(b1.pointer.pointsAt() + b1.size);
+		b1.free = false;
+		b2.free = true;
 	}
 
 }

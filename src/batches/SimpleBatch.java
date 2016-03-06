@@ -1,8 +1,6 @@
 package batches;
 
 import memory.BestFit;
-import memory.FirstFit;
-import memory.Memory;
 import memory.Pointer;
 
 public class SimpleBatch {
@@ -26,7 +24,7 @@ public class SimpleBatch {
 		BestFit m = new BestFit(100); // Swap this for  your own implementation
 		Pointer p1, p2, p3, p4, p5, p6;
 		
-		p1 = m.alloc(100);
+		p1 = m.alloc(20);
 		p1.write(range(1, 20));
 		
 		//System.out.println("111111111111111111111111111111 \n" + m);
@@ -67,10 +65,10 @@ public class SimpleBatch {
 		
 		m.printLayout();
 
-		/*
+
 		m.compact();
 		System.out.println("After compact()");
 		m.printLayout();
-		*/
+
 	}
 }
