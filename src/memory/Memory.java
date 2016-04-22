@@ -45,7 +45,7 @@ public abstract class Memory extends RawMemory {
 	public abstract void printLayout();
 
 	protected String[][] generateEmptyMemory(int size) {
-		String[][] output = new String[5][size + 2];
+		String[][] output = new String[5][size + Integer.toString(size).length()];
 
 		output[0][0] = " ";
 		output[1][0] = "┌";
@@ -67,6 +67,14 @@ public abstract class Memory extends RawMemory {
 			output[3][i] = "─";
 			output[4][i] = " ";
 
+		}
+
+		for (int i = size + 2; i < output[0].length; i++) {
+			output[0][i] = " ";
+			output[1][i] = " ";
+			output[2][i] = " ";
+			output[3][i] = " ";
+			output[4][i] = " ";
 		}
 
 		return output;

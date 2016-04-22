@@ -23,7 +23,7 @@ public class BestFit extends Memory {
 		}
 
 		public String toString() {
-			return String.format("%02d - %02d\t\t%s (size %d)", pointer.pointsAt(), pointer.pointsAt() + size - 1, free ? "Free" : "Allocated", size);
+			return String.format("%03d - %03d\t\t%s (size %d)", pointer.pointsAt(), pointer.pointsAt() + size - 1, free ? "Free" : "Allocated", size);
 		}
 	}
 
@@ -66,9 +66,9 @@ public class BestFit extends Memory {
 		if (size > this.cells.length)
 			return null;
 
-		System.out.println("Allocating " + size);
+		System.out.println("Allocating block of size " + size);
 
-		Pointer p = null;
+		Pointer p = new Pointer(this);
 
 		for (Block block : blocks) {
 
@@ -123,7 +123,7 @@ public class BestFit extends Memory {
 	 */
 	@Override
 	public void release(Pointer p) {
-		System.out.println("Releasing " + p.pointsAt());
+		System.out.println("Releasing memory at " + p.pointsAt());
 
 		for (Block block : blocks) {
 			if (!block.pointer.equals(p))
@@ -146,16 +146,19 @@ public class BestFit extends Memory {
 	}
 
 	private Block combine(Block b1, Block b2) {
-		Block combined = null;
-		if (b1.free && b2.free) {
+		Block combined = b1;
+		if (b1 != null && b1.free && b2 != null && b2.free) {
 			combined = new Block(b1.pointer, b1.size + b2.size);
 			blocks.remove(b1);
 			blocks.remove(b2);
 			blocks.add(combined);
 
-			b1.previous.next = combined;
 			combined.previous = b1.previous;
 			combined.next = b2.next;
+			if (b1.previous != null)
+				b1.previous.next = combined;
+			if (b2.next != null)
+				b2.next.previous = combined;
 		}
 
 		return combined;
@@ -235,7 +238,7 @@ public class BestFit extends Memory {
 				}
 			}
 
-			printAlternateLayout();
+			//printAlternateLayout();
 		}
 
 		sort();
